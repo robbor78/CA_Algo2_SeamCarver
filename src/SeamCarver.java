@@ -77,6 +77,8 @@ public class SeamCarver {
                 relax(distTo, edgeTo, x + 1, x, y, mp);
 
             }
+            
+            ResetDistTo(distTo,y);
         }
 
         int result[] = new int[height];
@@ -89,6 +91,13 @@ public class SeamCarver {
         }
 
         return result;
+    }
+
+    private void ResetDistTo(double[][] distTo, int y) {
+        int prevY = (y - 1) % 2;
+        for (int x = 0; x < width; x++) {
+            distTo[x][prevY] = Double.POSITIVE_INFINITY;
+        }
     }
 
     private void relax(double distTo[][], int edgeTo[][], int prevX, int x,
