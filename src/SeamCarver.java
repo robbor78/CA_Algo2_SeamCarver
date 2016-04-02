@@ -9,7 +9,7 @@ public class SeamCarver {
     private static double ENERGY_BORDER = 1000;
     private int width, height;
     private Picture picture;
-    private double[][] energyArr;
+    private double[][] ea;
 
     // create a seam carver object based on
     // the given picture
@@ -43,12 +43,12 @@ public class SeamCarver {
     // energy of pixel at column x and row y
     public double energy(int x, int y) {
         CheckValidIndices(x, y);
-        return energyArr[x][y];
+        return ea[x][y];
     }
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam() {
-        return null;
+        return findSeam(height, width, true);
     }
 
     // sequence of indices for vertical seam
@@ -125,9 +125,9 @@ public class SeamCarver {
     }
 
     private void buildEnergyArray() {
-        energyArr = new double[width][];
+        ea = new double[width][];
         for (int x = 0; x < width; x++) {
-            energyArr[x] = new double[height];
+            ea[x] = new double[height];
             for (int y = 0; y < height; y++) {
                 buildEnergyEntry(x, y);
             }
@@ -143,7 +143,7 @@ public class SeamCarver {
             int ygrad = grad(picture.get(x, y - 1), picture.get(x, y + 1));
             val = Math.sqrt(xgrad + ygrad);
         }
-        energyArr[x][y] = val;
+        ea[x][y] = val;
     }
 
     private int grad(Color c1, Color c2) {
@@ -152,7 +152,7 @@ public class SeamCarver {
         int db = c1.getBlue() - c2.getBlue();
         return dr * dr + dg * dg + db * db;
     }
-    
+
     private int[] findSeam(int width, int height, boolean isTranspose) {
         int edgeTo[][] = new int[width][];
         double distTo[][] = new double[width][];
@@ -172,9 +172,9 @@ public class SeamCarver {
             mp.dist = Double.POSITIVE_INFINITY;
             for (int x = 0; x < width; x++) {
 
-                relax(distTo, edgeTo, x - 1, x, y, mp);
-                relax(distTo, edgeTo, x, x, y, mp);
-                relax(distTo, edgeTo, x + 1, x, y, mp);
+                relax(distTo, edgeTo, width, isTranspose, x - 1, x, y, mp);
+                relax(distTo, edgeTo, width, isTranspose, x, x, y, mp);
+                relax(distTo, edgeTo, width, isTranspose, x + 1, x, y, mp);
 
             }
 
@@ -200,8 +200,8 @@ public class SeamCarver {
         }
     }
 
-    private void relax(double distTo[][], int edgeTo[][], int prevX, int x,
-            int y, MinPair mp) {
+    private void relax(double distTo[][], int edgeTo[][], int width,
+            boolean isTranspose, int prevX, int x, int y, MinPair mp) {
 
         if (prevX < 0 || prevX >= width) {
             return;
@@ -210,7 +210,9 @@ public class SeamCarver {
         int prevY = (y - 1) % 2;
         int distToY = y % 2;
 
-        double tmp = distTo[prevX][prevY] + energyArr[x][y];
+        double energy = isTranspose ? ea[y][x] : ea[x][y];
+
+        double tmp = distTo[prevX][prevY] + energy;
         if (tmp < distTo[x][distToY]) {
             edgeTo[x][y] = prevX;
             distTo[x][distToY] = tmp;
