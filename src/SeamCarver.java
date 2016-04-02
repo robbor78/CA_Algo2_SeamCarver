@@ -53,7 +53,6 @@ public class SeamCarver {
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        int dim = width * height;
         int edgeTo[][] = new int[width][];
         double distTo[][] = new double[width][];
 
