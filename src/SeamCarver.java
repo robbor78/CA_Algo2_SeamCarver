@@ -7,7 +7,7 @@ public class SeamCarver {
     private static final double ENERGY_BORDER = 1000;
     private int width, height, dim;
     private double[] ea;
-    private Color[] colors;
+    private int[] colors;
 
     // create a seam carver object based on
     // the given picture
@@ -31,7 +31,8 @@ public class SeamCarver {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                picture.set(x, y, colors[xy2l(x, y)]);
+                int rgb = colors[xy2l(x, y)];
+                picture.set(x, y, new Color(rgb));
             }
         }
 
@@ -128,10 +129,10 @@ public class SeamCarver {
     }
 
     private void buildColorArray(Picture picture) {
-        colors = new Color[dim];
+        colors = new int[dim];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                colors[xy2l(x, y)] = picture.get(x, y);
+                colors[xy2l(x, y)] = picture.get(x, y).getRGB();
             }
         }
     }
@@ -179,11 +180,24 @@ public class SeamCarver {
         }
     }
 
-    private int grad(Color c1, Color c2) {
-        int dr = c1.getRed() - c2.getRed();
-        int dg = c1.getGreen() - c2.getGreen();
-        int db = c1.getBlue() - c2.getBlue();
+    private int grad(int c1, int c2) {
+        int dr = getRed(c1) - getRed(c2);
+        int dg = getGreen(c1) - getGreen(c2);
+        int db = getBlue(c1) - getBlue(c2);
         return dr * dr + dg * dg + db * db;
+    }
+
+    private int getRed(int rgb) {
+        return (rgb >> 16) & 0xFF;
+    }
+
+    private int getGreen(int rgb) {
+        return (rgb >> 8) & 0xFF;
+    }
+
+    private int getBlue(int rgb) {
+        return rgb & 0xFF;
+
     }
 
     private int[] findSeam(int w, int h, boolean isTranspose) {
@@ -264,7 +278,7 @@ public class SeamCarver {
         int ndim = nwidth * nheight;
 
         double[] nea = new double[ndim];
-        Color[] ncolors = new Color[ndim];
+        int[] ncolors = new int[ndim];
 
         int lLast = 0;
         int lNew = 0;
@@ -290,10 +304,6 @@ public class SeamCarver {
             lNew++;
         }
 
-        for (int x = 0; x < dim; x++) {
-            colors[x] = null;
-        }
-
         ea = null;
         colors = null;
 
@@ -316,7 +326,7 @@ public class SeamCarver {
         int ndim = nwidth * nheight;
 
         double[] nea = new double[ndim];
-        Color[] ncolors = new Color[ndim];
+        int[] ncolors = new int[ndim];
 
         int length = seam.length;
         for (int x = 0; x < length; x++) {
@@ -337,10 +347,6 @@ public class SeamCarver {
 
                 yNew++;
             }
-        }
-
-        for (int x = 0; x < dim; x++) {
-            colors[x] = null;
         }
 
         ea = null;
