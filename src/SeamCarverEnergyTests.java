@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import edu.princeton.cs.algs4.Picture;
 
-public class SeamCarverTests {
+public class SeamCarverEnergyTests {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
