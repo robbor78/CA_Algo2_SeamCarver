@@ -1,6 +1,4 @@
 import java.awt.Color;
-import java.util.Iterator;
-import java.util.Stack;
 
 import edu.princeton.cs.algs4.Picture;
 
@@ -70,16 +68,19 @@ public class SeamCarver {
     public void removeHorizontalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, width, height);
 
-        int length = seam.length;
-        for (int x = 0; x < length; x++) {
-            int y = seam[x];
-
-            Color[] src = colors[x];
-            int copyLength = height - y - 1;
-            System.arraycopy(src, y + 1, src, y, copyLength);
-        }
-
-        height--;
+//        int length = seam.length;
+//        for (int x = 0; x < length; x++) {
+//            int y = seam[x];
+//
+//            Color[] src = colors[x];
+//            int copyLength = height - y - 1;
+//            if (copyLength > 0) {
+//                System.arraycopy(src, y + 1, src, y, copyLength);
+//                System.arraycopy(ea, y + 1, ea, y, copyLength);
+//            }
+//        }
+//
+//        height--;
 
     }
 
@@ -88,14 +89,15 @@ public class SeamCarver {
     public void removeVerticalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, height, width);
 
-        int length = seam.length;
-        for (int y = 0; y < length; y++) {
-            int xstart = seam[y];
-            for (int x = xstart + 1; x < width; x++) {
-                colors[x - 1][y] = colors[x][y];
-            }
-        }
-        width--;
+//        int length = seam.length;
+//        for (int y = 0; y < length; y++) {
+//            int xstart = seam[y];
+//            for (int x = xstart + 1; x < width; x++) {
+//                colors[x - 1][y] = colors[x][y];
+//                ea[x - 1][y] = ea[x][y];
+//            }
+//        }
+//        width--;
     }
 
     private void CheckValidRemoveSeam(int[] seam, int expectedSeamLength,
