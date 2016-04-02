@@ -1,4 +1,6 @@
 import java.awt.Color;
+import java.util.Iterator;
+import java.util.Stack;
 
 import edu.princeton.cs.algs4.Picture;
 
@@ -51,7 +53,74 @@ public class SeamCarver {
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        return null;
+        int dim = width * height;
+        int edgeTo[][] = new int[width][];
+        double distTo[][] = new double[width][];
+
+        for (int x = 0; x < width; x++) {
+            edgeTo[x] = new int[height];
+            edgeTo[x][0] = 0;
+
+            distTo[x] = new double[2];
+            distTo[x][0] = ENERGY_BORDER;
+            distTo[x][1] = Double.POSITIVE_INFINITY;
+        }
+
+        MinPair mp = new MinPair();
+        mp.x = 0;
+        mp.dist = Double.POSITIVE_INFINITY;
+        for (int y = 1; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+
+                relax(distTo, edgeTo, x - 1, x, y, mp);
+                relax(distTo, edgeTo, x, x, y, mp);
+                relax(distTo, edgeTo, x + 1, x, y, mp);
+
+            }
+        }
+
+        Stack<Integer> stack = new Stack<Integer>();
+
+        int x = mp.x;
+        for (int y = height - 1; y <= 0; y--) {
+            int tmpX = edgeTo[x][y];
+            stack.push(x);
+            x = tmpX;
+        }
+
+        int result[] = new int[height];
+        int count = 0;
+        for (Integer i : stack) {
+            result[count++] = i;
+        }
+
+        return result;
+    }
+
+    private void relax(double distTo[][], int edgeTo[][], int prevX, int x,
+            int y, MinPair mp) {
+
+        if (prevX < 0 || prevX >= width) {
+            return;
+        }
+
+        int prevY = (y - 1) % 2;
+        int distToY = y % 2;
+
+        double tmp = distTo[prevX][prevY] + energyArr[x][y];
+        if (tmp < distTo[x][distToY]) {
+            edgeTo[x][y] = prevX;
+            distTo[x][distToY] = tmp;
+
+            if (tmp < mp.dist) {
+                mp.x = x;
+                mp.dist = tmp;
+            }
+
+        }
+
+        return distTo[x][distToY];
+
     }
 
     // remove horizontal seam from
@@ -175,6 +244,11 @@ public class SeamCarver {
         int dg = c1.getGreen() - c2.getGreen();
         int db = c1.getBlue() - c2.getBlue();
         return dr * dr + dg * dg + db * db;
+    }
+
+    private class MinPair {
+        private int x;
+        private double dist;
     }
 
 }
