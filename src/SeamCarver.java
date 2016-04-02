@@ -71,9 +71,6 @@ public class SeamCarver {
 
         removeSeam(seam, false);
 
-        height--;
-        dim = width * height;
-
         rebuildEnergyArrayHorizontal(seam);
 
     }
@@ -84,9 +81,6 @@ public class SeamCarver {
         CheckValidRemoveSeam(seam, height, width);
 
         removeSeam(seam, true);
-
-        width--;
-        dim = width * height;
 
         rebuildEnergyArrayVertical(seam);
 
@@ -152,11 +146,11 @@ public class SeamCarver {
     }
 
     private void buildEnergyEntry(int x, int y) {
-        
-        if (x<0 || y<0 || x>=width || y>=height) {
+
+        if (x < 0 || y < 0 || x >= width || y >= height) {
             return;
         }
-        
+
         double val;
         if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
             val = ENERGY_BORDER;
@@ -199,7 +193,7 @@ public class SeamCarver {
             }
         }
     }
-    
+
     private int grad(Color c1, Color c2) {
         int dr = c1.getRed() - c2.getRed();
         int dg = c1.getGreen() - c2.getGreen();
@@ -277,28 +271,43 @@ public class SeamCarver {
             }
         }
     }
-    
+
     private void removeSeam(int[] seam, boolean isVertical) {
-        double nea[] = new double[dim - 1];
-        Color ncolors[] = new Color[dim - 1];
+        int nwidth = isVertical ? width - 1 : width;
+        int nheight = isVertical ? height : height - 1;
+        int ndim = nwidth * nheight;
+        double nea[] = new double[ndim];
+        Color ncolors[] = new Color[ndim];
         int lLast = 0;
+        int lNew = 0;
         int length = seam.length;
         for (int x = 0; x < length; x++) {
             int y = seam[x];
             int lNow = isVertical ? XY2L(y, x) : XY2L(x, y);
 
             for (int l = lLast; l < lNow; l++) {
-                nea[l] = ea[l];
-                ncolors[l] = colors[l];
+                nea[lNew] = ea[l];
+                ncolors[lNew] = colors[l];
+                lNew++;
             }
-            lLast = lNow;
+            lLast = lNow + 1;
 
         }
-        
+
+        for (int l = lLast; l < dim; l++) {
+            nea[lNew] = ea[l];
+            ncolors[lNew] = colors[l];
+            lNew++;
+        }
+
         ea = nea;
         nea = null;
-        colors =ncolors;
+        colors = ncolors;
         ncolors = null;
+
+        width = nwidth;
+        height = nheight;
+        dim = ndim;
 
     }
 
@@ -306,23 +315,23 @@ public class SeamCarver {
         return x + y * width;
     }
 
-//    private XY L2XY(int l) {
-//        XY xy = new XY();
-//
-//        xy.x = l % width;
-//        xy.y = (int) ((double) l / (double) (width));
-//
-//        return xy;
-//    }
+    // private XY L2XY(int l) {
+    // XY xy = new XY();
+    //
+    // xy.x = l % width;
+    // xy.y = (int) ((double) l / (double) (width));
+    //
+    // return xy;
+    // }
 
     private class MinPair {
         private int x;
         private double dist;
     }
 
-//    private class XY {
-//        private int x;
-//        private int y;
-//    }
+    // private class XY {
+    // private int x;
+    // private int y;
+    // }
 
 }
