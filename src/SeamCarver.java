@@ -69,13 +69,37 @@ public class SeamCarver {
     public void removeHorizontalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, width, height);
 
+        removeSeam(seam, false);
+
+        height--;
+        dim = width * height;
+
+        rebuildEnergyArray(seam, false);
+
+    }
+
+    // remove vertical seam from
+    // current picture
+    public void removeVerticalSeam(int[] seam) {
+        CheckValidRemoveSeam(seam, height, width);
+
+        removeSeam(seam, true);
+
+        width--;
+        dim = width * height;
+
+        rebuildEnergyArray(seam, true);
+
+    }
+
+    private void removeSeam(int[] seam, boolean isVertical) {
         double nea[] = new double[dim - 1];
         Color ncolors[] = new Color[dim - 1];
         int lLast = 0;
         int length = seam.length;
         for (int x = 0; x < length; x++) {
             int y = seam[x];
-            int lNow = XY2L(x, y);
+            int lNow = isVertical ? XY2L(y, x) : XY2L(x, y);
 
             for (int l = lLast; l < lNow; l++) {
                 nea[l] = ea[l];
@@ -85,11 +109,15 @@ public class SeamCarver {
 
         }
 
-        height--;
-        dim = width * height;
+    }
 
-        for (int x = 0; x < length; x++) {
-            int y = seam[x];
+    private void rebuildEnergyArray(int[] seam, boolean isVertical) {
+        int length = seam.length;
+        for (int i = 0; i < length; i++) {
+            int j = seam[i];
+
+            int x = isVertical ? j : i;
+            int y = isVertical ? j : i;
 
             if (y == height) {
                 ea[XY2L(x, y - 1)] = ENERGY_BORDER;
@@ -100,23 +128,6 @@ public class SeamCarver {
                 buildEnergyEntry(x + 1, y);
             }
         }
-
-    }
-
-    // remove vertical seam from
-    // current picture
-    public void removeVerticalSeam(int[] seam) {
-        CheckValidRemoveSeam(seam, height, width);
-
-        // int length = seam.length;
-        // for (int y = 0; y < length; y++) {
-        // int xstart = seam[y];
-        // for (int x = xstart + 1; x < width; x++) {
-        // colors[x - 1][y] = colors[x][y];
-        // ea[x - 1][y] = ea[x][y];
-        // }
-        // }
-        // width--;
     }
 
     private void CheckValidRemoveSeam(int[] seam, int expectedSeamLength,
