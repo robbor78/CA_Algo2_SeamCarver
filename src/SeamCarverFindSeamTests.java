@@ -16,7 +16,7 @@ public class SeamCarverFindSeamTests {
         int seams[][] = { { 0, 1, 1, 0 }, { 6, 7, 7, 6, 6, 7, 7, 7, 8, 7 },
                 { 6, 7, 7, 7, 7, 7, 8, 8, 7, 6 } };
 
-        test(filenames, seams);
+        test(filenames, seams,true);
     }
 
     @Test
@@ -24,17 +24,22 @@ public class SeamCarverFindSeamTests {
         int seams[][] = { { 1, 2, 1 }, { 7, 8, 7, 8, 7, 6, 5, 6, 6, 5, 4, 3 },
                 { 0, 1, 2, 3, 3, 3, 3, 2, 1, 0 } };
 
-        test(filenames, seams);
+        test(filenames, seams, false);
     }
 
-    private void test(String[] filenames, int seams[][]) {
+    private void test(String[] filenames, int seams[][], boolean isVertical) {
         int length = seams.length;
 
         for (int i = 0; i < length; i++) {
             String filename = filenames[i];
             Picture p = new Picture(filename);
             SeamCarver sc = new SeamCarver(p);
-            int actual[] = sc.findVerticalSeam();
+            int actual[];
+            if (isVertical) {
+                actual = sc.findVerticalSeam();
+            } else {
+                actual = sc.findHorizontalSeam();
+            }
             int expected[] = seams[i];
             TestEqual(expected, actual);
         }

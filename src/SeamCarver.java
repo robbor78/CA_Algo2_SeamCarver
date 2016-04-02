@@ -178,7 +178,7 @@ public class SeamCarver {
 
             }
 
-            ResetDistTo(distTo, y);
+            ResetDistTo(distTo, width, y);
         }
 
         int result[] = new int[height];
@@ -193,7 +193,7 @@ public class SeamCarver {
         return result;
     }
 
-    private void ResetDistTo(double[][] distTo, int y) {
+    private void ResetDistTo(double[][] distTo, int width, int y) {
         int prevY = (y - 1) % 2;
         for (int x = 0; x < width; x++) {
             distTo[x][prevY] = Double.POSITIVE_INFINITY;
