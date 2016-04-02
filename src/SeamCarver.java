@@ -47,17 +47,56 @@ public class SeamCarver {
     // remove horizontal seam from
     // current picture
     public void removeHorizontalSeam(int[] seam) {
-        if (seam == null) {
-            throw new java.lang.NullPointerException();
-        }
+        CheckValidRemoveSeam(seam, picture.width(), picture.height());
+
+        // Throw a java.lang.IllegalArgumentException if
+        // removeVerticalSeam() or removeHorizontalSeam()
+        // is called with an array of the wrong length or
+        // if the array is not a valid seam
+        // (i.e., either an entry is outside its prescribed range
+        // or two adjacent entries differ by more than 1).
 
     }
 
     // remove vertical seam from
     // current picture
     public void removeVerticalSeam(int[] seam) {
+        CheckValidRemoveSeam(seam, picture.height(), picture.width());
+
+        // Throw a java.lang.IllegalArgumentException if
+        // removeVerticalSeam() or removeHorizontalSeam()
+        // is called with an array of the wrong length or
+        // if the array is not a valid seam
+        // (i.e., either an entry is outside its prescribed range
+        // or two adjacent entries differ by more than 1).
+    }
+
+    private void CheckValidRemoveSeam(int[] seam, int expectedSeamLength,
+            int max) {
         if (seam == null) {
             throw new java.lang.NullPointerException();
+        }
+
+        if (max <= 1) {
+            throw new java.lang.IllegalArgumentException();
+        }
+
+        int actualSeamLength = seam.length;
+        if (actualSeamLength != expectedSeamLength) {
+            throw new java.lang.IllegalArgumentException();
+        }
+
+        for (int i = 0; i < actualSeamLength; i++) {
+            int val = seam[i];
+            if (val < 0 || val >= max) {
+                throw new java.lang.IllegalArgumentException();
+            }
+
+            if (i > 0) {
+                if (Math.abs(val - seam[i - 1]) > 1) {
+                    throw new java.lang.IllegalArgumentException();
+                }
+            }
         }
 
     }
