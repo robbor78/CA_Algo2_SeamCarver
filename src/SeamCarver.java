@@ -152,6 +152,11 @@ public class SeamCarver {
     }
 
     private void buildEnergyEntry(int x, int y) {
+        
+        if (x<0 || y<0 || x>=width || y>=height) {
+            return;
+        }
+        
         double val;
         if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
             val = ENERGY_BORDER;
