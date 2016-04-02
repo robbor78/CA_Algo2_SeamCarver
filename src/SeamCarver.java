@@ -79,19 +79,13 @@ public class SeamCarver {
             }
         }
 
-        Stack<Integer> stack = new Stack<Integer>();
+        int result[] = new int[height];
 
         int x = mp.x;
         for (int y = height - 1; y <= 0; y--) {
             int tmpX = edgeTo[x][y];
-            stack.push(x);
+            result[y] = x;
             x = tmpX;
-        }
-
-        int result[] = new int[height];
-        int count = 0;
-        for (Integer i : stack) {
-            result[count++] = i;
         }
 
         return result;
@@ -118,8 +112,6 @@ public class SeamCarver {
             }
 
         }
-
-        return distTo[x][distToY];
 
     }
 
