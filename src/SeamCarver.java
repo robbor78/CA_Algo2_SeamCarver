@@ -339,7 +339,7 @@ public class SeamCarver {
         int nheight = height - 1;
         int ndim = nwidth * nheight;
 
-        double[] nea = new double[ndim];
+        //double[] nea = new double[ndim];
         int[] ncolors = new int[ndim];
 
         int length = seam.length;
@@ -367,7 +367,7 @@ public class SeamCarver {
         colors = null;
 
         // ea = nea;
-        nea = null;
+        //nea = null;
         colors = ncolors;
         ncolors = null;
 
