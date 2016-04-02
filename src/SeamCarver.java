@@ -66,9 +66,9 @@ public class SeamCarver {
         }
 
         MinPair mp = new MinPair();
-        mp.x = 0;
-        mp.dist = Double.POSITIVE_INFINITY;
         for (int y = 1; y < height; y++) {
+            mp.x = 0;
+            mp.dist = Double.POSITIVE_INFINITY;
             for (int x = 0; x < width; x++) {
 
                 relax(distTo, edgeTo, x - 1, x, y, mp);
@@ -83,7 +83,7 @@ public class SeamCarver {
         int result[] = new int[height];
 
         int x = mp.x;
-        for (int y = height - 1; y <= 0; y--) {
+        for (int y = height - 1; y >= 0; y--) {
             int tmpX = edgeTo[x][y];
             result[y] = x;
             x = tmpX;
