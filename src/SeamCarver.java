@@ -290,8 +290,16 @@ public class SeamCarver {
             lNew++;
         }
 
+        for (int x = 0; x < dim; x++) {
+            colors[x] = null;
+        }
+
+        ea = null;
+        colors = null;
+
         ea = nea;
         nea = null;
+
         colors = ncolors;
         ncolors = null;
 
@@ -330,6 +338,13 @@ public class SeamCarver {
                 yNew++;
             }
         }
+
+        for (int x = 0; x < dim; x++) {
+            colors[x] = null;
+        }
+
+        ea = null;
+        colors = null;
 
         ea = nea;
         nea = null;
