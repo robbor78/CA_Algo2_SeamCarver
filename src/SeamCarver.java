@@ -294,6 +294,11 @@ public class SeamCarver {
             lLast = lNow;
 
         }
+        
+        ea = nea;
+        nea = null;
+        colors =ncolors;
+        ncolors = null;
 
     }
 

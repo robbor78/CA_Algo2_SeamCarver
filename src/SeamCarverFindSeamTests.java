@@ -8,20 +8,23 @@ public class SeamCarverFindSeamTests {
 
     private String[] filenames = {
             "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/3x4.png",
+            "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/5x6.png",
             "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/12x10.png",
             "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/10x10.png" };
 
     @Test
     public void testVertical() {
-        int seams[][] = { { 0, 1, 1, 0 }, { 6, 7, 7, 6, 6, 7, 7, 7, 8, 7 },
+        int seams[][] = { { 0, 1, 1, 0 }, { 1, 2, 2, 3, 2, 1 },
+                { 6, 7, 7, 6, 6, 7, 7, 7, 8, 7 },
                 { 6, 7, 7, 7, 7, 7, 8, 8, 7, 6 } };
 
-        test(filenames, seams,true);
+        test(filenames, seams, true);
     }
 
     @Test
     public void testHorizontal() {
-        int seams[][] = { { 1, 2, 1 }, { 7, 8, 7, 8, 7, 6, 5, 6, 6, 5, 4, 3 },
+        int seams[][] = { { 1, 2, 1 }, { 2, 3, 2, 3, 2 },
+                { 7, 8, 7, 8, 7, 6, 5, 6, 6, 5, 4, 3 },
                 { 0, 1, 2, 3, 3, 3, 3, 2, 1, 0 } };
 
         test(filenames, seams, false);
