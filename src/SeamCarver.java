@@ -6,7 +6,7 @@ public class SeamCarver {
 
     private static final double ENERGY_BORDER = 1000;
     private int width, height, dim;
-    private double[] ea;
+    // private double[] ea;
     private int[] colors;
 
     // create a seam carver object based on
@@ -21,7 +21,7 @@ public class SeamCarver {
         dim = width * height;
 
         buildColorArray(picture);
-        buildEnergyArray();
+        // buildEnergyArray();
 
     }
 
@@ -52,7 +52,8 @@ public class SeamCarver {
     // energy of pixel at column x and row y
     public double energy(int x, int y) {
         checkValidIndices(x, y);
-        return ea[xy2l(x, y)];
+        return getEnergy(x, y);
+        // return ea[xy2l(x, y)];
     }
 
     // sequence of indices for horizontal seam
@@ -72,7 +73,7 @@ public class SeamCarver {
 
         removeSeamHorizontal(seam);
 
-        rebuildEnergyArray(false, seam);
+        // rebuildEnergyArray(false, seam);
 
     }
 
@@ -83,7 +84,7 @@ public class SeamCarver {
 
         removeSeamVertical(seam);
 
-        rebuildEnergyArray(true, seam);
+        // rebuildEnergyArray(true, seam);
 
     }
 
@@ -137,20 +138,7 @@ public class SeamCarver {
         }
     }
 
-    private void buildEnergyArray() {
-        ea = new double[dim];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                buildEnergyEntry(x, y);
-            }
-        }
-    }
-
-    private void buildEnergyEntry(int x, int y) {
-
-        if (x < 0 || y < 0 || x >= width || y >= height) {
-            return;
-        }
+    private double getEnergy(int x, int y) {
 
         double val;
         if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
@@ -160,25 +148,51 @@ public class SeamCarver {
             int ygrad = grad(colors[xy2l(x, y - 1)], colors[xy2l(x, y + 1)]);
             val = Math.sqrt(xgrad + ygrad);
         }
-        ea[xy2l(x, y)] = val;
+        return val;
     }
 
-    private void rebuildEnergyArray(boolean isVertical, int[] seam) {
-        int length = seam.length;
-        for (int i = 0; i < length; i++) {
-            int j = seam[i];
+    // private void buildEnergyArray() {
+    // ea = new double[dim];
+    // for (int x = 0; x < width; x++) {
+    // for (int y = 0; y < height; y++) {
+    // buildEnergyEntry(x, y);
+    // }
+    // }
+    // }
 
-            int x = isVertical ? j : i;
-            int y = isVertical ? i : j;
+    // private void buildEnergyEntry(int x, int y) {
+    //
+    // if (x < 0 || y < 0 || x >= width || y >= height) {
+    // return;
+    // }
+    //
+    // double val;
+    // if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+    // val = ENERGY_BORDER;
+    // } else {
+    // int xgrad = grad(colors[xy2l(x - 1, y)], colors[xy2l(x + 1, y)]);
+    // int ygrad = grad(colors[xy2l(x, y - 1)], colors[xy2l(x, y + 1)]);
+    // val = Math.sqrt(xgrad + ygrad);
+    // }
+    // ea[xy2l(x, y)] = val;
+    // }
 
-            buildEnergyEntry(x, y);
-            buildEnergyEntry(x, y - 1);
-            buildEnergyEntry(x, y + 1);
-            buildEnergyEntry(x - 1, y);
-            buildEnergyEntry(x + 1, y);
-
-        }
-    }
+    // private void rebuildEnergyArray(boolean isVertical, int[] seam) {
+    // int length = seam.length;
+    // for (int i = 0; i < length; i++) {
+    // int j = seam[i];
+    //
+    // int x = isVertical ? j : i;
+    // int y = isVertical ? i : j;
+    //
+    // buildEnergyEntry(x, y);
+    // buildEnergyEntry(x, y - 1);
+    // buildEnergyEntry(x, y + 1);
+    // buildEnergyEntry(x - 1, y);
+    // buildEnergyEntry(x + 1, y);
+    //
+    // }
+    // }
 
     private int grad(int c1, int c2) {
         int dr = getRed(c1) - getRed(c2);
@@ -257,7 +271,7 @@ public class SeamCarver {
         int prevY = (y - 1) % 2;
         int distToY = y % 2;
 
-        double energy = isTranspose ? ea[xy2l(y, x)] : ea[xy2l(x, y)];
+        double energy = isTranspose ? getEnergy(y, x) : getEnergy(x, y);
 
         double tmp = distTo[prevX][prevY] + energy;
         if (tmp < distTo[x][distToY]) {
@@ -277,7 +291,7 @@ public class SeamCarver {
         int nheight = height;
         int ndim = nwidth * nheight;
 
-        double[] nea = new double[ndim];
+        // double[] nea = new double[ndim];
         int[] ncolors = new int[ndim];
 
         int lLast = 0;
@@ -290,7 +304,7 @@ public class SeamCarver {
             int lNow = xy2l(x, y);
 
             for (int l = lLast; l < lNow; l++) {
-                nea[lNew] = ea[l];
+                // nea[lNew] = ea[l];
                 ncolors[lNew] = colors[l];
                 lNew++;
             }
@@ -299,16 +313,16 @@ public class SeamCarver {
         }
 
         for (int l = lLast; l < dim; l++) {
-            nea[lNew] = ea[l];
+            // nea[lNew] = ea[l];
             ncolors[lNew] = colors[l];
             lNew++;
         }
 
-        ea = null;
+        // ea = null;
         colors = null;
 
-        ea = nea;
-        nea = null;
+        // ea = nea;
+        // nea = null;
 
         colors = ncolors;
         ncolors = null;
@@ -342,17 +356,17 @@ public class SeamCarver {
                 int lOrig = xy2l(x, yOrig);
                 int lNew = xy2l(x, yNew);
 
-                nea[lNew] = ea[lOrig];
+                // nea[lNew] = ea[lOrig];
                 ncolors[lNew] = colors[lOrig];
 
                 yNew++;
             }
         }
 
-        ea = null;
+        // ea = null;
         colors = null;
 
-        ea = nea;
+        // ea = nea;
         nea = null;
         colors = ncolors;
         ncolors = null;
