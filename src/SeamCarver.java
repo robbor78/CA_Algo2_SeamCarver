@@ -74,7 +74,7 @@ public class SeamCarver {
         height--;
         dim = width * height;
 
-        rebuildEnergyArray(seam, false);
+        rebuildEnergyArrayHorizontal(seam);
 
     }
 
@@ -88,46 +88,8 @@ public class SeamCarver {
         width--;
         dim = width * height;
 
-        rebuildEnergyArray(seam, true);
+        rebuildEnergyArrayVertical(seam);
 
-    }
-
-    private void removeSeam(int[] seam, boolean isVertical) {
-        double nea[] = new double[dim - 1];
-        Color ncolors[] = new Color[dim - 1];
-        int lLast = 0;
-        int length = seam.length;
-        for (int x = 0; x < length; x++) {
-            int y = seam[x];
-            int lNow = isVertical ? XY2L(y, x) : XY2L(x, y);
-
-            for (int l = lLast; l < lNow; l++) {
-                nea[l] = ea[l];
-                ncolors[l] = colors[l];
-            }
-            lLast = lNow;
-
-        }
-
-    }
-
-    private void rebuildEnergyArray(int[] seam, boolean isVertical) {
-        int length = seam.length;
-        for (int i = 0; i < length; i++) {
-            int j = seam[i];
-
-            int x = isVertical ? j : i;
-            int y = isVertical ? j : i;
-
-            if (y == height) {
-                ea[XY2L(x, y - 1)] = ENERGY_BORDER;
-            } else {
-                buildEnergyEntry(x, y);
-                buildEnergyEntry(x, y - 1);
-                buildEnergyEntry(x - 1, y);
-                buildEnergyEntry(x + 1, y);
-            }
-        }
     }
 
     private void CheckValidRemoveSeam(int[] seam, int expectedSeamLength,
@@ -201,6 +163,38 @@ public class SeamCarver {
         ea[XY2L(x, y)] = val;
     }
 
+    private void rebuildEnergyArrayHorizontal(int[] seam) {
+        int length = seam.length;
+        for (int x = 0; x < length; x++) {
+            int y = seam[x];
+
+            if (y == height) {
+                ea[XY2L(x, y - 1)] = ENERGY_BORDER;
+            } else {
+                buildEnergyEntry(x, y);
+                buildEnergyEntry(x, y - 1);
+                buildEnergyEntry(x - 1, y);
+                buildEnergyEntry(x + 1, y);
+            }
+        }
+    }
+
+    private void rebuildEnergyArrayVertical(int[] seam) {
+        int length = seam.length;
+        for (int y = 0; y < length; y++) {
+            int x = seam[y];
+
+            if (x == width) {
+                ea[XY2L(x - 1, y)] = ENERGY_BORDER;
+            } else {
+                buildEnergyEntry(x, y);
+                buildEnergyEntry(x - 1, y);
+                buildEnergyEntry(x, y - 1);
+                buildEnergyEntry(x, y + 1);
+            }
+        }
+    }
+    
     private int grad(Color c1, Color c2) {
         int dr = c1.getRed() - c2.getRed();
         int dg = c1.getGreen() - c2.getGreen();
@@ -278,28 +272,47 @@ public class SeamCarver {
             }
         }
     }
+    
+    private void removeSeam(int[] seam, boolean isVertical) {
+        double nea[] = new double[dim - 1];
+        Color ncolors[] = new Color[dim - 1];
+        int lLast = 0;
+        int length = seam.length;
+        for (int x = 0; x < length; x++) {
+            int y = seam[x];
+            int lNow = isVertical ? XY2L(y, x) : XY2L(x, y);
+
+            for (int l = lLast; l < lNow; l++) {
+                nea[l] = ea[l];
+                ncolors[l] = colors[l];
+            }
+            lLast = lNow;
+
+        }
+
+    }
 
     private int XY2L(int x, int y) {
         return x + y * width;
     }
 
-    private XY L2XY(int l) {
-        XY xy = new XY();
-
-        xy.x = l % width;
-        xy.y = (int) ((double) l / (double) (width));
-
-        return xy;
-    }
+//    private XY L2XY(int l) {
+//        XY xy = new XY();
+//
+//        xy.x = l % width;
+//        xy.y = (int) ((double) l / (double) (width));
+//
+//        return xy;
+//    }
 
     private class MinPair {
         private int x;
         private double dist;
     }
 
-    private class XY {
-        private int x;
-        private int y;
-    }
+//    private class XY {
+//        private int x;
+//        private int y;
+//    }
 
 }
