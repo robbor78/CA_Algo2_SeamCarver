@@ -5,9 +5,9 @@ import edu.princeton.cs.algs4.Picture;
 public class SeamCarver {
 
     private static double ENERGY_BORDER = 1000;
-    private int width, height;
-    private double[][] ea;
-    private Color[][] colors;
+    private int width, height, dim;
+    private double[] ea;
+    private Color[] colors;
 
     // create a seam carver object based on
     // the given picture
@@ -18,6 +18,7 @@ public class SeamCarver {
 
         width = picture.width();
         height = picture.height();
+        dim = width * height;
 
         buildEnergyArray(picture);
         buildColorArray(picture);
@@ -30,7 +31,7 @@ public class SeamCarver {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                picture.set(x, y, colors[x][y]);
+                picture.set(x, y, colors[XY2L(x, y)]);
             }
         }
 
@@ -50,7 +51,7 @@ public class SeamCarver {
     // energy of pixel at column x and row y
     public double energy(int x, int y) {
         CheckValidIndices(x, y);
-        return ea[x][y];
+        return ea[XY2L(x, y)];
     }
 
     // sequence of indices for horizontal seam
@@ -68,19 +69,19 @@ public class SeamCarver {
     public void removeHorizontalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, width, height);
 
-//        int length = seam.length;
-//        for (int x = 0; x < length; x++) {
-//            int y = seam[x];
-//
-//            Color[] src = colors[x];
-//            int copyLength = height - y - 1;
-//            if (copyLength > 0) {
-//                System.arraycopy(src, y + 1, src, y, copyLength);
-//                System.arraycopy(ea, y + 1, ea, y, copyLength);
-//            }
-//        }
-//
-//        height--;
+        // int length = seam.length;
+        // for (int x = 0; x < length; x++) {
+        // int y = seam[x];
+        //
+        // Color[] src = colors[x];
+        // int copyLength = height - y - 1;
+        // if (copyLength > 0) {
+        // System.arraycopy(src, y + 1, src, y, copyLength);
+        // System.arraycopy(ea, y + 1, ea, y, copyLength);
+        // }
+        // }
+        //
+        // height--;
 
     }
 
@@ -89,15 +90,15 @@ public class SeamCarver {
     public void removeVerticalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, height, width);
 
-//        int length = seam.length;
-//        for (int y = 0; y < length; y++) {
-//            int xstart = seam[y];
-//            for (int x = xstart + 1; x < width; x++) {
-//                colors[x - 1][y] = colors[x][y];
-//                ea[x - 1][y] = ea[x][y];
-//            }
-//        }
-//        width--;
+        // int length = seam.length;
+        // for (int y = 0; y < length; y++) {
+        // int xstart = seam[y];
+        // for (int x = xstart + 1; x < width; x++) {
+        // colors[x - 1][y] = colors[x][y];
+        // ea[x - 1][y] = ea[x][y];
+        // }
+        // }
+        // width--;
     }
 
     private void CheckValidRemoveSeam(int[] seam, int expectedSeamLength,
@@ -142,19 +143,17 @@ public class SeamCarver {
     }
 
     private void buildColorArray(Picture picture) {
-        colors = new Color[width][];
+        colors = new Color[dim];
         for (int x = 0; x < width; x++) {
-            colors[x] = new Color[height];
             for (int y = 0; y < height; y++) {
-                colors[x][y] = picture.get(x, y);
+                colors[XY2L(x, y)] = picture.get(x, y);
             }
         }
     }
 
     private void buildEnergyArray(Picture picture) {
-        ea = new double[width][];
+        ea = new double[dim];
         for (int x = 0; x < width; x++) {
-            ea[x] = new double[height];
             for (int y = 0; y < height; y++) {
                 buildEnergyEntry(picture, x, y);
             }
@@ -170,7 +169,7 @@ public class SeamCarver {
             int ygrad = grad(picture.get(x, y - 1), picture.get(x, y + 1));
             val = Math.sqrt(xgrad + ygrad);
         }
-        ea[x][y] = val;
+        ea[XY2L(x, y)] = val;
     }
 
     private int grad(Color c1, Color c2) {
@@ -205,7 +204,7 @@ public class SeamCarver {
 
             }
 
-            ResetDistTo(distTo, width, y);
+            resetDistTo(distTo, width, y);
         }
 
         int result[] = new int[height];
@@ -220,7 +219,7 @@ public class SeamCarver {
         return result;
     }
 
-    private void ResetDistTo(double[][] distTo, int width, int y) {
+    private void resetDistTo(double[][] distTo, int width, int y) {
         int prevY = (y - 1) % 2;
         for (int x = 0; x < width; x++) {
             distTo[x][prevY] = Double.POSITIVE_INFINITY;
@@ -237,7 +236,7 @@ public class SeamCarver {
         int prevY = (y - 1) % 2;
         int distToY = y % 2;
 
-        double energy = isTranspose ? ea[y][x] : ea[x][y];
+        double energy = isTranspose ? ea[XY2L(y, x)] : ea[XY2L(x, y)];
 
         double tmp = distTo[prevX][prevY] + energy;
         if (tmp < distTo[x][distToY]) {
@@ -253,9 +252,27 @@ public class SeamCarver {
 
     }
 
+    private int XY2L(int x, int y) {
+        return x + y * width;
+    }
+
+    private XY L2XY(int l) {
+        XY xy = new XY();
+
+        xy.x = l % width;
+        xy.y = (int) ((double) l / (double) (width));
+
+        return xy;
+    }
+
     private class MinPair {
         private int x;
         private double dist;
+    }
+
+    private class XY {
+        private int x;
+        private int y;
     }
 
 }
