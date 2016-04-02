@@ -53,74 +53,7 @@ public class SeamCarver {
 
     // sequence of indices for vertical seam
     public int[] findVerticalSeam() {
-        int edgeTo[][] = new int[width][];
-        double distTo[][] = new double[width][];
-
-        for (int x = 0; x < width; x++) {
-            edgeTo[x] = new int[height];
-            edgeTo[x][0] = 0;
-
-            distTo[x] = new double[2];
-            distTo[x][0] = ENERGY_BORDER;
-            distTo[x][1] = Double.POSITIVE_INFINITY;
-        }
-
-        MinPair mp = new MinPair();
-        for (int y = 1; y < height; y++) {
-            mp.x = 0;
-            mp.dist = Double.POSITIVE_INFINITY;
-            for (int x = 0; x < width; x++) {
-
-                relax(distTo, edgeTo, x - 1, x, y, mp);
-                relax(distTo, edgeTo, x, x, y, mp);
-                relax(distTo, edgeTo, x + 1, x, y, mp);
-
-            }
-            
-            ResetDistTo(distTo,y);
-        }
-
-        int result[] = new int[height];
-
-        int x = mp.x;
-        for (int y = height - 1; y >= 0; y--) {
-            int tmpX = edgeTo[x][y];
-            result[y] = x;
-            x = tmpX;
-        }
-
-        return result;
-    }
-
-    private void ResetDistTo(double[][] distTo, int y) {
-        int prevY = (y - 1) % 2;
-        for (int x = 0; x < width; x++) {
-            distTo[x][prevY] = Double.POSITIVE_INFINITY;
-        }
-    }
-
-    private void relax(double distTo[][], int edgeTo[][], int prevX, int x,
-            int y, MinPair mp) {
-
-        if (prevX < 0 || prevX >= width) {
-            return;
-        }
-
-        int prevY = (y - 1) % 2;
-        int distToY = y % 2;
-
-        double tmp = distTo[prevX][prevY] + energyArr[x][y];
-        if (tmp < distTo[x][distToY]) {
-            edgeTo[x][y] = prevX;
-            distTo[x][distToY] = tmp;
-
-            if (tmp < mp.dist) {
-                mp.x = x;
-                mp.dist = tmp;
-            }
-
-        }
-
+        return findSeam(width, height, false);
     }
 
     // remove horizontal seam from
@@ -180,32 +113,6 @@ public class SeamCarver {
 
     }
 
-    public static void main(String[] args) {
-        testEnergy();
-    }
-
-    private static void testEnergy() {
-        System.out.println("testEnergy");
-
-        String filename = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/3x4.png";
-
-        double[][] ea = { { 1000, 1000, 1000 }, { 1000, 228.53, 1000 },
-                { 1000, 228.09, 1000 }, { 1000, 1000, 1000 } };
-
-        Picture p = new Picture(filename);
-        SeamCarver sc = new SeamCarver(p);
-
-        for (int x = 0; x < sc.width(); x++) {
-            for (int y = 0; y < sc.height(); y++) {
-                double actual = sc.energy(x, y);
-                double expected = ea[x][y];
-
-                assert Math.abs(actual - expected) < 0.001;
-            }
-        }
-
-    }
-
     private void CheckValidIndices(int x, int y) {
         CheckValidIndex(x, width);
         CheckValidIndex(y, height);
@@ -244,6 +151,77 @@ public class SeamCarver {
         int dg = c1.getGreen() - c2.getGreen();
         int db = c1.getBlue() - c2.getBlue();
         return dr * dr + dg * dg + db * db;
+    }
+    
+    private int[] findSeam(int width, int height, boolean isTranspose) {
+        int edgeTo[][] = new int[width][];
+        double distTo[][] = new double[width][];
+
+        for (int x = 0; x < width; x++) {
+            edgeTo[x] = new int[height];
+            edgeTo[x][0] = 0;
+
+            distTo[x] = new double[2];
+            distTo[x][0] = ENERGY_BORDER;
+            distTo[x][1] = Double.POSITIVE_INFINITY;
+        }
+
+        MinPair mp = new MinPair();
+        for (int y = 1; y < height; y++) {
+            mp.x = 0;
+            mp.dist = Double.POSITIVE_INFINITY;
+            for (int x = 0; x < width; x++) {
+
+                relax(distTo, edgeTo, x - 1, x, y, mp);
+                relax(distTo, edgeTo, x, x, y, mp);
+                relax(distTo, edgeTo, x + 1, x, y, mp);
+
+            }
+
+            ResetDistTo(distTo, y);
+        }
+
+        int result[] = new int[height];
+
+        int x = mp.x;
+        for (int y = height - 1; y >= 0; y--) {
+            int tmpX = edgeTo[x][y];
+            result[y] = x;
+            x = tmpX;
+        }
+
+        return result;
+    }
+
+    private void ResetDistTo(double[][] distTo, int y) {
+        int prevY = (y - 1) % 2;
+        for (int x = 0; x < width; x++) {
+            distTo[x][prevY] = Double.POSITIVE_INFINITY;
+        }
+    }
+
+    private void relax(double distTo[][], int edgeTo[][], int prevX, int x,
+            int y, MinPair mp) {
+
+        if (prevX < 0 || prevX >= width) {
+            return;
+        }
+
+        int prevY = (y - 1) % 2;
+        int distToY = y % 2;
+
+        double tmp = distTo[prevX][prevY] + energyArr[x][y];
+        if (tmp < distTo[x][distToY]) {
+            edgeTo[x][y] = prevX;
+            distTo[x][distToY] = tmp;
+
+            if (tmp < mp.dist) {
+                mp.x = x;
+                mp.dist = tmp;
+            }
+
+        }
+
     }
 
     private class MinPair {
