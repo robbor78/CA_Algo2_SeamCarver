@@ -11,9 +11,11 @@ public class SeamCarverFindSeamTests {
 
         String[] filenames = {
                 "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/3x4.png",
-                "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/12x10.png" };
+                "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/12x10.png",
+                "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/10x10.png" };
 
-        int seams[][] = { { 0, 1, 1, 0 }, { 6, 7, 7, 6, 6, 7, 7, 7, 8, 7 } };
+        int seams[][] = { { 0, 1, 1, 0 }, { 6, 7, 7, 6, 6, 7, 7, 7, 8, 7 },
+                { 6, 7, 7, 7, 7, 7, 8, 8, 7, 6 } };
 
         int length = seams.length;
 
@@ -30,8 +32,8 @@ public class SeamCarverFindSeamTests {
 
     private void TestEqual(int[] expected, int[] actual) {
         assertEquals(expected.length, actual.length);
-        
-        for (int i=0; i<expected.length; i++) {
+
+        for (int i = 0; i < expected.length; i++) {
             assertEquals(expected[i], actual[i]);
         }
     }
