@@ -1,8 +1,13 @@
+import java.awt.Color;
+
 import edu.princeton.cs.algs4.Picture;
 
 public class SeamCarver {
 
+    private static double ENERGY_BORDER = 1000;
+    private int width, height;
     private Picture picture;
+    private double[][] energyArr;
 
     // create a seam carver object based on
     // the given picture
@@ -10,28 +15,33 @@ public class SeamCarver {
         if (picture == null) {
             throw new java.lang.NullPointerException();
         }
+        
         this.picture = new Picture(picture);
+        width = picture.width();
+        height = picture.height();
+
+        buildEnergyArray();
     }
 
     // current picture
     public Picture picture() {
-        return null;
+        return picture;
     }
 
     // width of current picture
     public int width() {
-        return picture.width();
+        return width;
     }
 
     // height of current picture
     public int height() {
-        return picture.height();
+        return height;
     }
 
     // energy of pixel at column x and row y
     public double energy(int x, int y) {
         CheckValidIndices(x, y);
-        return Double.NaN;
+        return energyArr[x][y];
     }
 
     // sequence of indices for horizontal seam
@@ -61,7 +71,7 @@ public class SeamCarver {
     // remove vertical seam from
     // current picture
     public void removeVerticalSeam(int[] seam) {
-        CheckValidRemoveSeam(seam, picture.height(), picture.width());
+        CheckValidRemoveSeam(seam, height, width);
 
         // Throw a java.lang.IllegalArgumentException if
         // removeVerticalSeam() or removeHorizontalSeam()
@@ -102,8 +112,8 @@ public class SeamCarver {
     }
 
     private void CheckValidIndices(int x, int y) {
-        CheckValidIndex(x, picture.width());
-        CheckValidIndex(y, picture.height());
+        CheckValidIndex(x, width);
+        CheckValidIndex(y, height);
     }
 
     private void CheckValidIndex(int i, int max) {
@@ -111,4 +121,34 @@ public class SeamCarver {
             throw new java.lang.IndexOutOfBoundsException();
         }
     }
+
+    private void buildEnergyArray() {
+        energyArr = new double[width][];
+        for (int x = 0; x < width; x++) {
+            energyArr[x] = new double[height];
+            for (int y = 0; y < height; y++) {
+                buildEnergyEntry(x, y);
+            }
+        }
+    }
+
+    private void buildEnergyEntry(int x, int y) {
+        double val;
+        if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
+            val = ENERGY_BORDER;
+        } else {
+            int xgrad = grad(picture.get(x - 1, y), picture.get(x + 1, y));
+            int ygrad = grad(picture.get(x, y - 1), picture.get(x, y + 1));
+            val = Math.sqrt(xgrad + ygrad);
+        }
+        energyArr[x][y] = val;
+    }
+
+    private int grad(Color c1, Color c2) {
+        int dr = c1.getRed() - c2.getRed();
+        int dg = c1.getGreen() - c2.getGreen();
+        int db = c1.getBlue() - c2.getBlue();
+        return dr * dr + dg * dg + db * db;
+    }
+
 }
