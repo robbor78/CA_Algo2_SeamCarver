@@ -15,7 +15,7 @@ public class SeamCarver {
         if (picture == null) {
             throw new java.lang.NullPointerException();
         }
-        
+
         this.picture = new Picture(picture);
         width = picture.width();
         height = picture.height();
@@ -106,6 +106,32 @@ public class SeamCarver {
                 if (Math.abs(val - seam[i - 1]) > 1) {
                     throw new java.lang.IllegalArgumentException();
                 }
+            }
+        }
+
+    }
+
+    public static void main(String[] args) {
+        testEnergy();
+    }
+
+    private static void testEnergy() {
+        System.out.println("testEnergy");
+
+        String filename = "/run/media/bert/280AC22E0AF59495/coursera/algorithms/2/assignments/2SeamCarving/seamCarving/3x4.png";
+
+        double[][] ea = { { 1000, 1000, 1000 }, { 1000, 228.53, 1000 },
+                { 1000, 228.09, 1000 }, { 1000, 1000, 1000 } };
+
+        Picture p = new Picture(filename);
+        SeamCarver sc = new SeamCarver(p);
+
+        for (int x = 0; x < sc.width(); x++) {
+            for (int y = 0; y < sc.height(); y++) {
+                double actual = sc.energy(x, y);
+                double expected = ea[x][y];
+
+                assert Math.abs(actual - expected) < 0.001;
             }
         }
 
