@@ -20,8 +20,8 @@ public class SeamCarver {
         height = picture.height();
         dim = width * height;
 
-        buildEnergyArray(picture);
         buildColorArray(picture);
+        buildEnergyArray();
 
     }
 
@@ -69,19 +69,37 @@ public class SeamCarver {
     public void removeHorizontalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, width, height);
 
-        // int length = seam.length;
-        // for (int x = 0; x < length; x++) {
-        // int y = seam[x];
-        //
-        // Color[] src = colors[x];
-        // int copyLength = height - y - 1;
-        // if (copyLength > 0) {
-        // System.arraycopy(src, y + 1, src, y, copyLength);
-        // System.arraycopy(ea, y + 1, ea, y, copyLength);
-        // }
-        // }
-        //
-        // height--;
+        double nea[] = new double[dim - 1];
+        Color ncolors[] = new Color[dim - 1];
+        int lLast = 0;
+        int length = seam.length;
+        for (int x = 0; x < length; x++) {
+            int y = seam[x];
+            int lNow = XY2L(x, y);
+
+            for (int l = lLast; l < lNow; l++) {
+                nea[l] = ea[l];
+                ncolors[l] = colors[l];
+            }
+            lLast = lNow;
+
+        }
+
+        height--;
+        dim = width * height;
+
+        for (int x = 0; x < length; x++) {
+            int y = seam[x];
+
+            if (y == height) {
+                ea[XY2L(x, y - 1)] = ENERGY_BORDER;
+            } else {
+                buildEnergyEntry(x, y);
+                buildEnergyEntry(x, y - 1);
+                buildEnergyEntry(x - 1, y);
+                buildEnergyEntry(x + 1, y);
+            }
+        }
 
     }
 
@@ -151,22 +169,22 @@ public class SeamCarver {
         }
     }
 
-    private void buildEnergyArray(Picture picture) {
+    private void buildEnergyArray() {
         ea = new double[dim];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                buildEnergyEntry(picture, x, y);
+                buildEnergyEntry(x, y);
             }
         }
     }
 
-    private void buildEnergyEntry(Picture picture, int x, int y) {
+    private void buildEnergyEntry(int x, int y) {
         double val;
         if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
             val = ENERGY_BORDER;
         } else {
-            int xgrad = grad(picture.get(x - 1, y), picture.get(x + 1, y));
-            int ygrad = grad(picture.get(x, y - 1), picture.get(x, y + 1));
+            int xgrad = grad(colors[XY2L(x - 1, y)], colors[XY2L(x + 1, y)]);
+            int ygrad = grad(colors[XY2L(x, y - 1)], colors[XY2L(x, y + 1)]);
             val = Math.sqrt(xgrad + ygrad);
         }
         ea[XY2L(x, y)] = val;
@@ -247,9 +265,7 @@ public class SeamCarver {
                 mp.x = x;
                 mp.dist = tmp;
             }
-
         }
-
     }
 
     private int XY2L(int x, int y) {
