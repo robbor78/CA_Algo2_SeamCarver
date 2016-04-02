@@ -8,8 +8,8 @@ public class SeamCarver {
 
     private static double ENERGY_BORDER = 1000;
     private int width, height;
-    private Picture picture;
     private double[][] ea;
+    private Color[][] colors;
 
     // create a seam carver object based on
     // the given picture
@@ -18,16 +18,17 @@ public class SeamCarver {
             throw new java.lang.NullPointerException();
         }
 
-        this.picture = new Picture(picture);
         width = picture.width();
         height = picture.height();
 
-        buildEnergyArray();
+        buildEnergyArray(picture);
+        buildColorArray(picture);
+
     }
 
     // current picture
     public Picture picture() {
-        return picture;
+        return null;
     }
 
     // width of current picture
@@ -59,7 +60,7 @@ public class SeamCarver {
     // remove horizontal seam from
     // current picture
     public void removeHorizontalSeam(int[] seam) {
-        CheckValidRemoveSeam(seam, picture.width(), picture.height());
+        CheckValidRemoveSeam(seam, width, height);
 
         // Throw a java.lang.IllegalArgumentException if
         // removeVerticalSeam() or removeHorizontalSeam()
@@ -75,12 +76,7 @@ public class SeamCarver {
     public void removeVerticalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, height, width);
 
-        // Throw a java.lang.IllegalArgumentException if
-        // removeVerticalSeam() or removeHorizontalSeam()
-        // is called with an array of the wrong length or
-        // if the array is not a valid seam
-        // (i.e., either an entry is outside its prescribed range
-        // or two adjacent entries differ by more than 1).
+
     }
 
     private void CheckValidRemoveSeam(int[] seam, int expectedSeamLength,
@@ -124,17 +120,27 @@ public class SeamCarver {
         }
     }
 
-    private void buildEnergyArray() {
-        ea = new double[width][];
+    private void buildColorArray(Picture picture) {
+        colors = new Color[width][];
         for (int x = 0; x < width; x++) {
-            ea[x] = new double[height];
+            colors[x] = new Color[height];
             for (int y = 0; y < height; y++) {
-                buildEnergyEntry(x, y);
+                colors[x][y] = picture.get(x, y);
             }
         }
     }
 
-    private void buildEnergyEntry(int x, int y) {
+    private void buildEnergyArray(Picture picture) {
+        ea = new double[width][];
+        for (int x = 0; x < width; x++) {
+            ea[x] = new double[height];
+            for (int y = 0; y < height; y++) {
+                buildEnergyEntry(picture, x, y);
+            }
+        }
+    }
+
+    private void buildEnergyEntry(Picture picture, int x, int y) {
         double val;
         if (x == 0 || x == width - 1 || y == 0 || y == height - 1) {
             val = ENERGY_BORDER;
