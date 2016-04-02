@@ -69,9 +69,9 @@ public class SeamCarver {
     public void removeHorizontalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, width, height);
 
-        removeSeam(seam, false);
+        removeSeamHorizontal(seam);
 
-        rebuildEnergyArrayHorizontal(seam);
+        rebuildEnergyArray(false, seam);
 
     }
 
@@ -80,9 +80,9 @@ public class SeamCarver {
     public void removeVerticalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, height, width);
 
-        removeSeam(seam, true);
+        removeSeamVertical( seam);
 
-        rebuildEnergyArrayVertical(seam);
+        rebuildEnergyArray(true, seam);
 
     }
 
@@ -162,37 +162,55 @@ public class SeamCarver {
         ea[XY2L(x, y)] = val;
     }
 
-    private void rebuildEnergyArrayHorizontal(int[] seam) {
+    private void rebuildEnergyArray(boolean isVertical, int[] seam) {
         int length = seam.length;
-        for (int x = 0; x < length; x++) {
-            int y = seam[x];
+        for (int i = 0; i < length; i++) {
+            int j = seam[i];
 
-            if (y == height) {
-                ea[XY2L(x, y - 1)] = ENERGY_BORDER;
-            } else {
-                buildEnergyEntry(x, y);
-                buildEnergyEntry(x, y - 1);
-                buildEnergyEntry(x - 1, y);
-                buildEnergyEntry(x + 1, y);
-            }
+            int x = isVertical ? j : i;
+            int y = isVertical ? i : j;
+
+            buildEnergyEntry(x, y);
+            buildEnergyEntry(x, y - 1);
+            buildEnergyEntry(x, y + 1);
+            buildEnergyEntry(x - 1, y);
+            buildEnergyEntry(x + 1, y);
+
         }
     }
 
-    private void rebuildEnergyArrayVertical(int[] seam) {
-        int length = seam.length;
-        for (int y = 0; y < length; y++) {
-            int x = seam[y];
+    // private void rebuildEnergyArrayHorizontal(int[] seam) {
+    // int length = seam.length;
+    // for (int x = 0; x < length; x++) {
+    // int y = seam[x];
+    //
+    // if (y == height) {
+    // ea[XY2L(x, y - 1)] = ENERGY_BORDER;
+    // } else {
+    // buildEnergyEntry(x, y);
+    // buildEnergyEntry(x, y - 1);
+    // buildEnergyEntry(x - 1, y);
+    // buildEnergyEntry(x + 1, y);
+    // }
+    // }
+    // }
 
-            if (x == width) {
-                ea[XY2L(x - 1, y)] = ENERGY_BORDER;
-            } else {
-                buildEnergyEntry(x, y);
-                buildEnergyEntry(x - 1, y);
-                buildEnergyEntry(x, y - 1);
-                buildEnergyEntry(x, y + 1);
-            }
-        }
-    }
+    // private void rebuildEnergyArrayVertical(int[] seam) {
+    // int length = seam.length;
+    // for (int y = 0; y < length; y++) {
+    // int x = seam[y];
+    //
+    // if (x == width) {
+    // ea[XY2L(x - 1, y)] = ENERGY_BORDER;
+    // } else {
+    // buildEnergyEntry(x, y);
+    // buildEnergyEntry(x - 1, y);
+    // buildEnergyEntry(x + 1, y);
+    // buildEnergyEntry(x, y - 1);
+    // buildEnergyEntry(x, y + 1);
+    // }
+    // }
+    // }
 
     private int grad(Color c1, Color c2) {
         int dr = c1.getRed() - c2.getRed();
@@ -272,18 +290,23 @@ public class SeamCarver {
         }
     }
 
-    private void removeSeam(int[] seam, boolean isVertical) {
-        int nwidth = isVertical ? width - 1 : width;
-        int nheight = isVertical ? height : height - 1;
+    private void removeSeamVertical( int[] seam) {
+
+        int nwidth =  width - 1;
+        int nheight =  height;
         int ndim = nwidth * nheight;
+
         double nea[] = new double[ndim];
         Color ncolors[] = new Color[ndim];
+
         int lLast = 0;
         int lNew = 0;
+
         int length = seam.length;
-        for (int x = 0; x < length; x++) {
-            int y = seam[x];
-            int lNow = isVertical ? XY2L(y, x) : XY2L(x, y);
+        for (int y = 0; y < length; y++) {
+            int x = seam[y];
+
+            int lNow = XY2L(x, y);
 
             for (int l = lLast; l < lNow; l++) {
                 nea[lNew] = ea[l];
@@ -298,6 +321,47 @@ public class SeamCarver {
             nea[lNew] = ea[l];
             ncolors[lNew] = colors[l];
             lNew++;
+        }
+
+        ea = nea;
+        nea = null;
+        colors = ncolors;
+        ncolors = null;
+
+        width = nwidth;
+        height = nheight;
+        dim = ndim;
+
+    }
+
+    private void removeSeamHorizontal(int[] seam) {
+
+        int nwidth = width;
+        int nheight = height - 1;
+        int ndim = nwidth * nheight;
+
+        double nea[] = new double[ndim];
+        Color ncolors[] = new Color[ndim];
+
+        int length = seam.length;
+        for (int x = 0; x < length; x++) {
+            int y = seam[x];
+
+            int yNew = 0;
+            for (int yOrig = 0; yOrig < height; yOrig++) {
+
+                if (yOrig == y) {
+                    continue;
+                }
+
+                int lOrig = XY2L(x, yOrig);
+                int lNew = XY2L(x, yNew);
+
+                nea[lNew] = ea[lOrig];
+                ncolors[lNew] = colors[lOrig];
+
+                yNew++;
+            }
         }
 
         ea = nea;
