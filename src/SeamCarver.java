@@ -28,7 +28,15 @@ public class SeamCarver {
 
     // current picture
     public Picture picture() {
-        return null;
+        Picture picture = new Picture(width, height);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                picture.set(x, y, colors[x][y]);
+            }
+        }
+
+        return picture;
     }
 
     // width of current picture
@@ -62,12 +70,16 @@ public class SeamCarver {
     public void removeHorizontalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, width, height);
 
-        // Throw a java.lang.IllegalArgumentException if
-        // removeVerticalSeam() or removeHorizontalSeam()
-        // is called with an array of the wrong length or
-        // if the array is not a valid seam
-        // (i.e., either an entry is outside its prescribed range
-        // or two adjacent entries differ by more than 1).
+        int length = seam.length;
+        for (int x = 0; x < length; x++) {
+            int y = seam[x];
+
+            Color[] src = colors[x];
+            int copyLength = height - y - 1;
+            System.arraycopy(src, y + 1, src, y, copyLength);
+        }
+
+        height--;
 
     }
 
@@ -76,7 +88,14 @@ public class SeamCarver {
     public void removeVerticalSeam(int[] seam) {
         CheckValidRemoveSeam(seam, height, width);
 
-
+        int length = seam.length;
+        for (int y = 0; y < length; y++) {
+            int xstart = seam[y];
+            for (int x = xstart + 1; x < width; x++) {
+                colors[x - 1][y] = colors[x][y];
+            }
+        }
+        width--;
     }
 
     private void CheckValidRemoveSeam(int[] seam, int expectedSeamLength,
